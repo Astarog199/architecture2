@@ -5,7 +5,7 @@ import ru.gb.android.workshop2.ServiceLocator
 
 object FeatureServiceLocator {
 
-    fun provideProductViewModelFactory(): ViewModelProvider.Factory {
+    fun provideProductViewModelFactory(): ProductsViewModelFactory {
         return ProductsViewModelFactory(
             consumeFirstProductUseCase = ServiceLocator.provideConsumeFirstProductUseCase(),
             productStateFactory = provideProductStateFactory(),

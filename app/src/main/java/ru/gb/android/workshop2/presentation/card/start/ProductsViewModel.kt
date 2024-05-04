@@ -23,7 +23,7 @@ class ProductsViewModel(
     private val consumeFirstProductUseCase: ConsumeFirstProductUseCase,
     private val productStateFactory: ProductStateFactory,
     private val consumePromosUseCase: ConsumePromosUseCase,
-    ): ViewModel(), ViewModelProvider.Factory {
+    ): ViewModel() {
     private val _state = MutableStateFlow(ProductScreenState())
     val state: StateFlow<ProductScreenState> =_state.asStateFlow()
 
@@ -37,7 +37,8 @@ class ProductsViewModel(
                 _state.update { productScreenState -> productScreenState.copy(isLoading = true) }
             }
             .onEach {productState ->
-                _state.update { productScreenState -> productScreenState.copy(
+                _state.update {
+                    productScreenState -> productScreenState.copy(
                         isLoading = false,
                         productState = productState,
                     )
