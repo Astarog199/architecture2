@@ -12,9 +12,9 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.coroutines.launch
-import ru.gb.android.workshop2.marketsample.R
 import ru.gb.android.workshop2.marketsample.databinding.FragmentPromoListBinding
 import ru.gb.android.workshop2.presentation.list.promo.adapter.PromoAdapter
+import ru.gb.android.workshop2.presentation.list.promo.model.PromoState
 
 class PromoListFragment : Fragment() {
 
@@ -52,8 +52,11 @@ class PromoListFragment : Fragment() {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.state.collect {state ->
                     binding.progress.visibility = View.VISIBLE
-                    binding.recyclerView.visibility = View.VISIBLE
-                    binding.progress.visibility = View.GONE
+                    when{
+                        state.hasError -> {showError(state.errorProvider(requireContext()))}
+                        state.isLoading -> showPromos(state.promosList)
+                        else -> hidePromos()
+                    }
                 }
             }
         }
@@ -61,22 +64,24 @@ class PromoListFragment : Fragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
+        viewModel.clearList()
         _binding = null
     }
 
-//    override fun showPromos(promoList: List<PromoState>) {
-//        binding.recyclerView.visibility = View.VISIBLE
-//        adapter.submitList(promoList)
-//    }
-//
-//    override fun hidePromos() {
-//        binding.recyclerView.visibility = View.GONE
-//    }
+     fun showPromos(promoList: List<PromoState>) {
+        binding.recyclerView.visibility = View.VISIBLE
+        adapter.submitList(promoList)
+        binding.progress.visibility = View.GONE
+    }
 
-    fun showError() {
+     fun hidePromos() {
+        binding.recyclerView.visibility = View.GONE
+    }
+
+    fun showError(error: String) {
         Toast.makeText(
             requireContext(),
-            getString(R.string.error_wile_loading_data),
+            error,
             Toast.LENGTH_SHORT
         ).show()
     }
