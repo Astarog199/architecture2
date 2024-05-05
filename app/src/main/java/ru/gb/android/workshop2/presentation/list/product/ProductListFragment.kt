@@ -6,20 +6,25 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
-import ru.gb.android.workshop2.marketsample.R
+import kotlinx.coroutines.launch
 import ru.gb.android.workshop2.marketsample.databinding.FragmentProductListBinding
 import ru.gb.android.workshop2.presentation.list.product.adapter.ProductsAdapter
+import ru.gb.android.workshop2.presentation.list.product.model.ProductModel
 
-class ProductListFragment : Fragment(), ProductListView {
+class ProductListFragment : Fragment() {
 
     private var _binding: FragmentProductListBinding? = null
     private val binding get() = _binding!!
 
     private val adapter = ProductsAdapter()
 
-    private val productListPresenter: ProductListPresenter by lazy {
-        FeatureServiceLocator.providePresenter()
+    private val viewModel by viewModels <ProductListViewModel> {
+        FeatureServiceLocator.provideProductViewModelFactory()
     }
 
     override fun onCreateView(
@@ -38,44 +43,45 @@ class ProductListFragment : Fragment(), ProductListView {
         binding.recyclerView.layoutManager = LinearLayoutManager(context)
 
         binding.swipeRefreshLayout.setOnRefreshListener {
-            productListPresenter.refresh()
+            viewModel.refresh()
         }
 
-        productListPresenter.onViewAttached(this)
-        productListPresenter.loadProduct()
+        viewModel.loadProduct()
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.state.collect{ state ->
+                    binding.progress.visibility = View.VISIBLE
+
+                    when {
+                        state.hasError -> showError(state.errorProvider(requireContext()))
+
+                        state.isLoading -> {
+                            showProducts(state.productList)
+                            binding.swipeRefreshLayout.isRefreshing = false
+                        }
+                    }
+                }
+            }
+        }
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
-        productListPresenter.dispose()
         _binding = null
+        viewModel.clearArray()
     }
 
-    override fun showProgress() {
-        binding.progress.visibility = View.VISIBLE
-    }
-
-    override fun hideProgress() {
+    fun showProducts(productList: List<ProductModel>) {
+        binding.recyclerView.visibility = View.VISIBLE
+        adapter.submitList(productList)
         binding.progress.visibility = View.GONE
     }
 
-    override fun hidePullToRefresh() {
-        binding.swipeRefreshLayout.isRefreshing = false
-    }
-
-    override fun showProducts(productList: List<ProductVO>) {
-        binding.recyclerView.visibility = View.VISIBLE
-        adapter.submitList(productList)
-    }
-
-    override fun hideProducts() {
-        binding.recyclerView.visibility = View.GONE
-    }
-
-    override fun showError() {
+     fun showError(error: String) {
         Toast.makeText(
             requireContext(),
-            getString(R.string.error_wile_loading_data),
+            error,
             Toast.LENGTH_SHORT
         ).show()
     }

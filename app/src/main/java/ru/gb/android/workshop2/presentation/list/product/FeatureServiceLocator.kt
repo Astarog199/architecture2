@@ -4,16 +4,16 @@ import ru.gb.android.workshop2.ServiceLocator
 
 object FeatureServiceLocator {
 
-    fun providePresenter(): ProductListPresenter {
-        return ProductListPresenter(
+    fun provideProductViewModelFactory(): ProductListViewModelFactory {
+        return ProductListViewModelFactory(
             consumeProductsUseCase = ServiceLocator.provideConsumeProductsUseCase(),
-            productVOFactory = provideProductVOFactory(),
+            productFactory = provideProductFactory(),
             consumePromosUseCase = ServiceLocator.provideConsumePromosUseCase(),
         )
     }
 
-    private fun provideProductVOFactory(): ProductVOFactory {
-        return ProductVOFactory(
+    private fun provideProductFactory(): ProductFactory {
+        return ProductFactory(
             discountFormatter = ServiceLocator.provideDiscountFormatter(),
             priceFormatter = ServiceLocator.providePriceFormatter(),
         )
