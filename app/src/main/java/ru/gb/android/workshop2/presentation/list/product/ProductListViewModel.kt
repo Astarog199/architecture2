@@ -38,9 +38,8 @@ class ProductListViewModel(
                 _state.update { products -> products.copy(isLoading = true) }
             }
             .onEach { productList ->
-                fillArray(productList)
                 _state.update {
-                    products -> products.copy (productList = productsArray)
+                    products -> products.copy (productList = productList)
                 }
             }
             .catch {
@@ -57,15 +56,4 @@ class ProductListViewModel(
     fun refresh() {
         loadProduct()
     }
-
-    fun fillArray(productList: List<ProductModel>) {
-        for (i in productList) {
-            productsArray.add(i)
-        }
-    }
-
-    fun clearArray() {
-       productsArray.clear()
-    }
-
 }

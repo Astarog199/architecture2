@@ -33,10 +33,9 @@ class PromoViewModel(
             .onStart {
                 _state.update { promoList -> promoList.copy(isLoading = true) }
             }
-            .onEach {promoState ->
-                fillList(promoState)
+            .onEach {promoList ->
                 _state.update {
-                    promoList -> promoList.copy( promosList = arr)
+                    promo -> promo.copy( promosList = promoList)
             }
             }
             .catch {
@@ -48,16 +47,6 @@ class PromoViewModel(
                 }
             }
             .launchIn(viewModelScope)
-    }
-
-    fun clearList(){
-        arr.clear()
-    }
-
-    fun fillList(promoState: List<PromoState>) {
-        for (i in  promoState) {
-            arr.add(i)
-        }
     }
 
     fun refresh() {

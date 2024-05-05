@@ -69,7 +69,6 @@ class ProductListFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
-        viewModel.clearArray()
     }
 
     fun showProducts(productList: List<ProductModel>) {

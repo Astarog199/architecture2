@@ -64,7 +64,6 @@ class PromoListFragment : Fragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
-        viewModel.clearList()
         _binding = null
     }
 
