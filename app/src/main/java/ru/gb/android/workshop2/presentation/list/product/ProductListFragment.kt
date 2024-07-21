@@ -44,6 +44,7 @@ class ProductListFragment : Fragment() {
 
         binding.swipeRefreshLayout.setOnRefreshListener {
             viewModel.refresh()
+            binding.swipeRefreshLayout.isRefreshing = false
         }
 
         viewModel.loadProduct()

@@ -25,7 +25,6 @@ class ProductListViewModel(
 
     private val _state = MutableStateFlow(ProductListState())
     val state: StateFlow<ProductListState> = _state.asStateFlow()
-    private val productsArray = mutableListOf<ProductState>()
 
     fun loadProduct() {
         combine(

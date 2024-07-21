@@ -23,7 +23,6 @@ class PromoViewModel(
 ): ViewModel() {
     private val _state = MutableStateFlow(PromosListState())
     val state: StateFlow<PromosListState> = _state.asStateFlow()
-    val arr = mutableListOf<PromoState>()
 
     fun loadPromos() {
         consumePromosUseCase()

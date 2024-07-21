@@ -44,6 +44,7 @@ class PromoListFragment : Fragment() {
 
         binding.swipeRefreshLayout.setOnRefreshListener {
             viewModel.refresh()
+            binding.swipeRefreshLayout.isRefreshing = false
         }
 
         viewModel.loadPromos()
@@ -73,11 +74,10 @@ class PromoListFragment : Fragment() {
     }
 
      private fun showLoading() {
-        binding.recyclerView.visibility = View.VISIBLE
+         binding.progress.visibility = View.VISIBLE
     }
 
      private fun showPromoList(promoList: List<PromoState>) {
-        binding.recyclerView.visibility = View.GONE
          adapter.submitList(promoList)
          binding.progress.visibility = View.GONE
     }
