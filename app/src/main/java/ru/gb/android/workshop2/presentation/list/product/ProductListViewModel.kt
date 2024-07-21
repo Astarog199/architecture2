@@ -14,8 +14,8 @@ import kotlinx.coroutines.flow.update
 import ru.gb.android.workshop2.domain.product.ConsumeProductsUseCase
 import ru.gb.android.workshop2.domain.promo.ConsumePromosUseCase
 import ru.gb.android.workshop2.marketsample.R
-import ru.gb.android.workshop2.presentation.list.product.model.ProductList
-import ru.gb.android.workshop2.presentation.list.product.model.ProductModel
+import ru.gb.android.workshop2.presentation.list.product.model.ProductListState
+import ru.gb.android.workshop2.presentation.list.product.model.ProductState
 
 class ProductListViewModel(
     private val consumeProductsUseCase: ConsumeProductsUseCase,
@@ -23,9 +23,9 @@ class ProductListViewModel(
     private val consumePromosUseCase: ConsumePromosUseCase,
 ) : ViewModel() {
 
-    private val _state = MutableStateFlow(ProductList())
-    val state: StateFlow<ProductList> = _state.asStateFlow()
-    private val productsArray = mutableListOf<ProductModel>()
+    private val _state = MutableStateFlow(ProductListState())
+    val state: StateFlow<ProductListState> = _state.asStateFlow()
+    private val productsArray = mutableListOf<ProductState>()
 
     fun loadProduct() {
         combine(
@@ -39,12 +39,13 @@ class ProductListViewModel(
             }
             .onEach { productList ->
                 _state.update {
-                    products -> products.copy (productList = productList)
+                    products -> products.copy (isLoading = false, productList = productList)
                 }
             }
             .catch {
                 _state.update {product ->
-                    product.copy (hasError = true,
+                    product.copy (
+                        hasError = true,
                         errorProvider = {context ->
                             context.getString(R.string.error_wile_loading_data) }
                     )
@@ -55,5 +56,9 @@ class ProductListViewModel(
 
     fun refresh() {
         loadProduct()
+    }
+
+    fun errorShown() {
+        _state.update { productScreenState -> productScreenState.copy (hasError = false) }
     }
 }

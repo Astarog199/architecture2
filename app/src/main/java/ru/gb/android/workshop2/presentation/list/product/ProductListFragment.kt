@@ -14,7 +14,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.coroutines.launch
 import ru.gb.android.workshop2.marketsample.databinding.FragmentProductListBinding
 import ru.gb.android.workshop2.presentation.list.product.adapter.ProductsAdapter
-import ru.gb.android.workshop2.presentation.list.product.model.ProductModel
+import ru.gb.android.workshop2.presentation.list.product.model.ProductState
 
 class ProductListFragment : Fragment() {
 
@@ -54,12 +54,12 @@ class ProductListFragment : Fragment() {
                     binding.progress.visibility = View.VISIBLE
 
                     when {
-                        state.hasError -> showError(state.errorProvider(requireContext()))
-
-                        state.isLoading -> {
-                            showProducts(state.productList)
-                            binding.swipeRefreshLayout.isRefreshing = false
+                        state.hasError -> {
+                            showError(state.errorProvider(requireContext()))
+                            viewModel.errorShown()
                         }
+                        state.isLoading -> showLoading()
+                        else-> showProducts(state.productList)
                     }
                 }
             }
@@ -71,13 +71,16 @@ class ProductListFragment : Fragment() {
         _binding = null
     }
 
-    fun showProducts(productList: List<ProductModel>) {
+    private fun showLoading() {
         binding.recyclerView.visibility = View.VISIBLE
+    }
+
+    private fun showProducts(productList: List<ProductState>) {
         adapter.submitList(productList)
         binding.progress.visibility = View.GONE
     }
 
-     fun showError(error: String) {
+     private fun showError(error: String) {
         Toast.makeText(
             requireContext(),
             error,

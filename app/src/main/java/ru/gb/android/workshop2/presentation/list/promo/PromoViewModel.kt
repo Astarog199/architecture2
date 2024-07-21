@@ -35,12 +35,13 @@ class PromoViewModel(
             }
             .onEach {promoList ->
                 _state.update {
-                    promo -> promo.copy( promosList = promoList)
+                    promo -> promo.copy(isLoading = false, promosList = promoList)
             }
             }
             .catch {
                 _state.update {promoList ->
-                    promoList.copy (hasError = true,
+                    promoList.copy (
+                        hasError = true,
                         errorProvider = {context ->
                             context.getString(R.string.error_wile_loading_data) }
                     )
@@ -51,5 +52,9 @@ class PromoViewModel(
 
     fun refresh() {
         loadPromos()
+    }
+
+    fun errorShown() {
+        _state.update { promoScreenState -> promoScreenState.copy(hasError = false) }
     }
 }

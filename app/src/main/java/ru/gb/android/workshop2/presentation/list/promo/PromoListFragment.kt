@@ -53,9 +53,14 @@ class PromoListFragment : Fragment() {
                 viewModel.state.collect {state ->
                     binding.progress.visibility = View.VISIBLE
                     when{
-                        state.hasError -> {showError(state.errorProvider(requireContext()))}
-                        state.isLoading -> showPromos(state.promosList)
-                        else -> hidePromos()
+                        state.isLoading -> showLoading()
+
+                        state.hasError -> {
+                            showError(state.errorProvider(requireContext()))
+                            viewModel.errorShown()
+                        }
+
+                        else -> showPromoList(state.promosList)
                     }
                 }
             }
@@ -67,17 +72,17 @@ class PromoListFragment : Fragment() {
         _binding = null
     }
 
-     fun showPromos(promoList: List<PromoState>) {
+     private fun showLoading() {
         binding.recyclerView.visibility = View.VISIBLE
-        adapter.submitList(promoList)
-        binding.progress.visibility = View.GONE
     }
 
-     fun hidePromos() {
+     private fun showPromoList(promoList: List<PromoState>) {
         binding.recyclerView.visibility = View.GONE
+         adapter.submitList(promoList)
+         binding.progress.visibility = View.GONE
     }
 
-    fun showError(error: String) {
+    private fun showError(error: String) {
         Toast.makeText(
             requireContext(),
             error,
